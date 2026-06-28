@@ -2,51 +2,66 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Perimity.Data;
 
-namespace Perimity;
+var builder = WebApplication.CreateBuilder(args);
 
-public class Program
-{
-    public static void Main(string[] args)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                       ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString)
+    ));
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
     {
-        var builder = WebApplication.CreateBuilder(args);
+        options.SignIn.RequireConfirmedAccount = false;
 
-        // Add services to the container.
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-                               throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlite(connectionString));
-        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+        options.Password.RequireDigit = true;
+        options.Password.RequiredLength = 6;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
 
-        builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-            .AddEntityFrameworkStores<ApplicationDbContext>();
-        builder.Services.AddControllersWithViews();
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
-        var app = builder.Build();
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseMigrationsEndPoint();
-        }
-        else
-        {
-            app.UseExceptionHandler("/Home/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
-        }
+builder.Services.AddControllersWithViews();
 
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
+var app = builder.Build();
 
-        app.UseRouting();
-
-        app.UseAuthorization();
-
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");
-        app.MapRazorPages();
-
-        app.Run();
-    }
+if (app.Environment.IsDevelopment())
+{
+    app.UseMigrationsEndPoint();
 }
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+
+// This is the correct one for .NET 8 MVC
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapRazorPages();
+
+app.Run();
