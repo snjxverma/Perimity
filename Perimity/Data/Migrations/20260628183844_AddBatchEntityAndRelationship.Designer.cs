@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Perimity.Data;
 
@@ -11,9 +12,11 @@ using Perimity.Data;
 namespace Perimity.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260628183844_AddBatchEntityAndRelationship")]
+    partial class AddBatchEntityAndRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -284,7 +287,7 @@ namespace Perimity.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Attendance_User_Date");
 
-                    b.ToTable("Attendances", (string)null);
+                    b.ToTable("Attendance", (string)null);
                 });
 
             modelBuilder.Entity("Perimity.Data.AuditLog", b =>
@@ -395,7 +398,7 @@ namespace Perimity.Data.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("CourseId")
+                    b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Designation")
@@ -434,7 +437,7 @@ namespace Perimity.Data.Migrations
 
                     b.HasIndex("ApprovedBy");
 
-                    b.HasIndex("CourseId");
+                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("EmployeeId")
                         .IsUnique();
@@ -490,7 +493,7 @@ namespace Perimity.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("OTPVerifications", (string)null);
+                    b.ToTable("OTPVerification", (string)null);
                 });
 
             modelBuilder.Entity("Perimity.Data.StudentProfile", b =>
@@ -530,6 +533,9 @@ namespace Perimity.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ParentContact")
                         .HasMaxLength(15)
                         .HasColumnType("varchar(15)");
@@ -566,6 +572,8 @@ namespace Perimity.Data.Migrations
 
                     b.HasIndex("BatchId");
 
+                    b.HasIndex("DepartmentId");
+
                     b.HasIndex("QRToken")
                         .IsUnique();
 
@@ -586,8 +594,9 @@ namespace Perimity.Data.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BatchId"));
 
-                    b.Property<int>("AdmissionMonth")
-                        .HasColumnType("int");
+                    b.Property<string>("AdmissionMonth")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<int>("AdmissionYear")
                         .HasColumnType("int");
@@ -600,13 +609,7 @@ namespace Perimity.Data.Migrations
                     b.Property<DateTime>("CourseEndDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CourseStartDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsActive")
@@ -618,52 +621,47 @@ namespace Perimity.Data.Migrations
                     b.Property<DateTime>("QRValidTill")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.HasKey("BatchId");
 
                     b.HasIndex("BatchCode")
                         .IsUnique();
 
-                    b.HasIndex("CourseId");
-
                     b.ToTable("Batches", (string)null);
                 });
 
-            modelBuilder.Entity("Perimity.Models.Course", b =>
+            modelBuilder.Entity("Perimity.Models.Department", b =>
                 {
-                    b.Property<int>("CourseId")
+                    b.Property<int>("DepartmentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CourseId"));
-
-                    b.Property<string>("CourseCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<string>("CourseName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("DepartmentId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("DepartmentCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("DepartmentName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
-                    b.HasKey("CourseId");
+                    b.HasKey("DepartmentId");
 
-                    b.HasIndex("CourseCode")
+                    b.HasIndex("DepartmentCode")
                         .IsUnique();
 
-                    b.HasIndex("CourseName")
+                    b.HasIndex("DepartmentName")
                         .IsUnique();
 
-                    b.ToTable("Courses", (string)null);
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -771,9 +769,9 @@ namespace Perimity.Data.Migrations
                         .HasForeignKey("ApprovedBy")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Perimity.Models.Course", "Course")
+                    b.HasOne("Perimity.Models.Department", "Department")
                         .WithMany("FacultyProfiles")
-                        .HasForeignKey("CourseId")
+                        .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -785,7 +783,7 @@ namespace Perimity.Data.Migrations
 
                     b.Navigation("ApprovedByUser");
 
-                    b.Navigation("Course");
+                    b.Navigation("Department");
 
                     b.Navigation("User");
                 });
@@ -809,8 +807,14 @@ namespace Perimity.Data.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Perimity.Models.Batch", "Batch")
-                        .WithMany("StudentProfiles")
+                        .WithMany("Students")
                         .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Perimity.Models.Department", "Department")
+                        .WithMany("StudentProfiles")
+                        .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -824,18 +828,9 @@ namespace Perimity.Data.Migrations
 
                     b.Navigation("Batch");
 
+                    b.Navigation("Department");
+
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Perimity.Models.Batch", b =>
-                {
-                    b.HasOne("Perimity.Models.Course", "Course")
-                        .WithMany("Batches")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("Perimity.Data.ApplicationUser", b =>
@@ -855,14 +850,14 @@ namespace Perimity.Data.Migrations
 
             modelBuilder.Entity("Perimity.Models.Batch", b =>
                 {
-                    b.Navigation("StudentProfiles");
+                    b.Navigation("Students");
                 });
 
-            modelBuilder.Entity("Perimity.Models.Course", b =>
+            modelBuilder.Entity("Perimity.Models.Department", b =>
                 {
-                    b.Navigation("Batches");
-
                     b.Navigation("FacultyProfiles");
+
+                    b.Navigation("StudentProfiles");
                 });
 #pragma warning restore 612, 618
         }

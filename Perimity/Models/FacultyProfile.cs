@@ -16,10 +16,10 @@ public class FacultyProfile
     public ApplicationUser User { get; set; } = null!;
 
     [Required]
-    public int DepartmentId { get; set; }
+    public int CourseId { get; set; }
 
-    [ForeignKey(nameof(DepartmentId))]
-    public Department Department { get; set; } = null!;
+    [ForeignKey(nameof(CourseId))]
+    public Course Course { get; set; } = null!;
 
     [Required]
     [StringLength(30)]
