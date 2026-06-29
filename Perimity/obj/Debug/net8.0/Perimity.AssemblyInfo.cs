@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Perimity")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+abe7237fca38e1be63ddf98d83d6a0c9debf9428")]
 [assembly: System.Reflection.AssemblyProductAttribute("Perimity")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Perimity")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
