@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Perimity.Data;
 
@@ -11,9 +12,11 @@ using Perimity.Data;
 namespace Perimity.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260628185915_RefactorDepartmentToCourseAndNormalizeBatch")]
+    partial class RefactorDepartmentToCourseAndNormalizeBatch
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -284,7 +287,7 @@ namespace Perimity.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Attendance_User_Date");
 
-                    b.ToTable("Attendances", (string)null);
+                    b.ToTable("Attendance", (string)null);
                 });
 
             modelBuilder.Entity("Perimity.Data.AuditLog", b =>
@@ -490,7 +493,7 @@ namespace Perimity.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("OTPVerifications", (string)null);
+                    b.ToTable("OTPVerification", (string)null);
                 });
 
             modelBuilder.Entity("Perimity.Data.StudentProfile", b =>
@@ -830,7 +833,7 @@ namespace Perimity.Data.Migrations
             modelBuilder.Entity("Perimity.Models.Batch", b =>
                 {
                     b.HasOne("Perimity.Models.Course", "Course")
-                        .WithMany("Batches")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -860,8 +863,6 @@ namespace Perimity.Data.Migrations
 
             modelBuilder.Entity("Perimity.Models.Course", b =>
                 {
-                    b.Navigation("Batches");
-
                     b.Navigation("FacultyProfiles");
                 });
 #pragma warning restore 612, 618

@@ -1,6 +1,7 @@
+using Perimity.Models;
+using Perimity.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Perimity.Models;
 
 namespace Perimity.Data;
 
@@ -16,27 +17,27 @@ public class StudentProfile
     public ApplicationUser User { get; set; } = null!;
 
     [Required]
-    public int DepartmentId { get; set; }
-
-    [ForeignKey(nameof(DepartmentId))]
-    public Department Department { get; set; } = null!;
-
-    [Required]
-    [StringLength(30)]
+    [StringLength(20)]
     public string RollNumber { get; set; } = string.Empty;
 
-    [Required]
-    public byte Year { get; set; }
+    //[Required]
+    //public byte Year { get; set; }
+
+    //[Required]
+    //public byte Semester { get; set; }
 
     [Required]
-    public byte Semester { get; set; }
+    public int BatchId { get; set; }
+
+    [ForeignKey(nameof(BatchId))]
+    public Batch Batch { get; set; } = null!;
 
     [Required]
-    [StringLength(20)]
+    [StringLength(12)]
     public string AadhaarNumber { get; set; } = string.Empty;
 
     [Required]
-    [StringLength(500)]
+    [StringLength(300)]
     public string Address { get; set; } = string.Empty;
 
     [StringLength(150)]
@@ -57,9 +58,13 @@ public class StudentProfile
     public DateTime? QRGeneratedAt { get; set; }
 
     public int? ApprovedBy { get; set; }
+    public ApprovalStatus ApprovalStatus { get; set; } = ApprovalStatus.Pending;
 
     [ForeignKey(nameof(ApprovedBy))]
     public ApplicationUser? ApprovedByUser { get; set; }
 
     public DateTime? ApprovedDate { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

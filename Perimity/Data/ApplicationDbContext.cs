@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Perimity.Models;
@@ -12,12 +12,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
     }
 
-    public DbSet<Department> Departments { get; set; }
+    public DbSet<Course> Courses { get; set; }
+    public DbSet<Batch> Batches { get; set; }
     public DbSet<StudentProfile> StudentProfiles { get; set; }
     public DbSet<FacultyProfile> FacultyProfiles { get; set; }
     public DbSet<Document> Documents { get; set; }
-    public DbSet<OTPVerification> OTPVerification { get; set; }
-    public DbSet<Attendance> Attendance { get; set; }
+    public DbSet<OTPVerification> OTPVerifications { get; set; }
+    public DbSet<Attendance> Attendances { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -25,21 +26,26 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     base.OnModelCreating(builder);
 
     // Exact table names
-    builder.Entity<Department>().ToTable("Departments");
+    builder.Entity<Course>().ToTable("Courses");
+    builder.Entity<Batch>().ToTable("Batches");
     builder.Entity<StudentProfile>().ToTable("StudentProfiles");
     builder.Entity<FacultyProfile>().ToTable("FacultyProfiles");
     builder.Entity<Document>().ToTable("Documents");
-    builder.Entity<OTPVerification>().ToTable("OTPVerification");
-    builder.Entity<Attendance>().ToTable("Attendance");
+    builder.Entity<OTPVerification>().ToTable("OTPVerifications");
+    builder.Entity<Attendance>().ToTable("Attendances");
     builder.Entity<AuditLog>().ToTable("AuditLogs");
 
     // Unique fields
-    builder.Entity<Department>()
-        .HasIndex(d => d.DepartmentName)
+    builder.Entity<Course>()
+        .HasIndex(c => c.CourseName)
         .IsUnique();
 
-    builder.Entity<Department>()
-        .HasIndex(d => d.DepartmentCode)
+    builder.Entity<Course>()
+        .HasIndex(c => c.CourseCode)
+        .IsUnique();
+
+    builder.Entity<Batch>()
+        .HasIndex(b => b.BatchCode)
         .IsUnique();
 
     builder.Entity<StudentProfile>()
@@ -84,11 +90,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         .HasForeignKey(s => s.ApprovedBy)
         .OnDelete(DeleteBehavior.SetNull);
 
-    // StudentProfile -> Department
+    // StudentProfile -> Batch
     builder.Entity<StudentProfile>()
-        .HasOne(s => s.Department)
-        .WithMany(d => d.StudentProfiles)
-        .HasForeignKey(s => s.DepartmentId)
+        .HasOne(s => s.Batch)
+        .WithMany(b => b.StudentProfiles)
+        .HasForeignKey(s => s.BatchId)
         .OnDelete(DeleteBehavior.Restrict);
 
     // FacultyProfile -> ApplicationUser
@@ -104,11 +110,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         .HasForeignKey(f => f.ApprovedBy)
         .OnDelete(DeleteBehavior.SetNull);
 
-    // FacultyProfile -> Department
+    // FacultyProfile -> Course
     builder.Entity<FacultyProfile>()
-        .HasOne(f => f.Department)
-        .WithMany(d => d.FacultyProfiles)
-        .HasForeignKey(f => f.DepartmentId)
+        .HasOne(f => f.Course)
+        .WithMany(c => c.FacultyProfiles)
+        .HasForeignKey(f => f.CourseId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    // Batch -> Course
+    builder.Entity<Batch>()
+        .HasOne(b => b.Course)
+        .WithMany(c => c.Batches)
+        .HasForeignKey(b => b.CourseId)
         .OnDelete(DeleteBehavior.Restrict);
 
     // Document -> ApplicationUser

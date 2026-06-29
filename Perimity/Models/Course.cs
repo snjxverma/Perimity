@@ -3,25 +3,25 @@ using Perimity.Data;
 
 namespace Perimity.Models;
 
-public class Department
+public class Course
 {
     [Key]
-    public int DepartmentId { get; set; }
+    public int CourseId { get; set; }
 
     [Required]
     [StringLength(100)]
-    public string DepartmentName { get; set; } = string.Empty;
+    public string CourseName { get; set; } = string.Empty;
 
     [Required]
     [StringLength(10)]
-    public string DepartmentCode { get; set; } = string.Empty;
+    public string CourseCode { get; set; } = string.Empty;
 
     public bool IsActive { get; set; } = true;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation properties
-    public ICollection<StudentProfile> StudentProfiles { get; set; } = new List<StudentProfile>();
+    public ICollection<Batch> Batches { get; set; } = new List<Batch>();
 
     public ICollection<FacultyProfile> FacultyProfiles { get; set; } = new List<FacultyProfile>();
 }
