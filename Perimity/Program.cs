@@ -32,8 +32,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
         options.Password.RequireLowercase = false;
 
         // Lockout rules
-        options.Lockout.MaxFailedAccessAttempts = 5;
-        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders()
